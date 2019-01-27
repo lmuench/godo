@@ -1,24 +1,21 @@
 package models
 
 import (
-	"net/http"
-
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
 )
 
-// Todo Model
+// Todo model
 type Todo struct {
 	gorm.Model
 	Title     string `json:"title"`
 	Completed bool   `json:"completed"`
 }
 
-// GetAll returns all todos
-func (r *Repo) GetAll(c echo.Context) error {
+// GetAll todos
+func (repo *Repo) GetAll() []Todo {
 	var todos []Todo
-	r.DB.Find(&todos)
-	return c.JSON(http.StatusOK, todos)
+	repo.DB.Find(&todos)
+	return todos
 }
 
 // Repo - Todo Repository

@@ -1,7 +1,7 @@
 package main
 
 import (
-	router "github.com/lmuench/godo/conf"
+	todo_api "github.com/lmuench/godo/api"
 	pg_connector "github.com/lmuench/godo/db"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -14,7 +14,8 @@ func main() {
 
 	e := echo.New()
 
-	router.Init(e, db)
+	// register routes
+	todo_api.Register(e, db)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
