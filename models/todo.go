@@ -12,13 +12,13 @@ type Todo struct {
 }
 
 // GetAll todos
-func (repo *Repo) GetAll() []Todo {
+func (repo *TodoRepo) GetAll() []Todo {
 	var todos []Todo
 	repo.DB.Find(&todos)
 	return todos
 }
 
-// Repo - Todo Repository
-type Repo struct {
+// TodoRepo - Todo Repository
+type TodoRepo struct {
 	DB *gorm.DB
 }

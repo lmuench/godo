@@ -1,4 +1,4 @@
-package db
+package orm
 
 import (
 	"github.com/jinzhu/gorm"
@@ -6,8 +6,8 @@ import (
 	"github.com/lmuench/godo/models"
 )
 
-// ConnectAndMigrate to Postgres with models
-func ConnectAndMigrate() *gorm.DB {
+// InitPG to Postgres with models
+func InitPG() *gorm.DB {
 	db, err := gorm.Open("postgres",
 		"host=localhost port=5432 dbname=godo_dev user=postgres password=postgres",
 	)

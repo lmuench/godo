@@ -5,7 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	todo "github.com/lmuench/godo/models"
+	"github.com/lmuench/godo/models"
 )
 
 // GetAll returns all todos
@@ -16,12 +16,12 @@ func (api TodoAPI) GetAll(ctx echo.Context) error {
 
 // TodoAPI - Todo Controller
 type TodoAPI struct {
-	repo *todo.Repo
+	repo *models.TodoRepo
 }
 
 // Register routes
-func Register(echo *echo.Echo, db *gorm.DB) {
-	repo := todo.Repo{DB: db}
+func RegisterTodo(echo *echo.Echo, db *gorm.DB) {
+	repo := models.TodoRepo{DB: db}
 	api := TodoAPI{&repo}
 
 	echo.GET("/todos", api.GetAll)
