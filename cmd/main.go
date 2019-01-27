@@ -9,13 +9,13 @@ import (
 )
 
 func main() {
-	db := pg_connector.Init()
+	db := pg_connector.ConnectAndMigrate()
 	defer db.Close()
 
-	e := echo.New()
+	echo := echo.New()
 
 	// register routes
-	todo_api.Register(e, db)
+	todo_api.Register(echo, db)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	echo.Logger.Fatal(echo.Start(":1323"))
 }
