@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/jinzhu/gorm"
@@ -12,18 +11,7 @@ import (
 // GetAllTodos returns all todos
 func (api TodoAPI) GetAllTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	todos := api.repo.GetAllTodos()
-	respondWithJSON(w, todos)
-}
-
-func respondWithJSON(w http.ResponseWriter, v interface{}) {
-	js, err := json.Marshal(v)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(js)
+	RespondWithJSON(w, todos)
 }
 
 // TodoAPI controller
