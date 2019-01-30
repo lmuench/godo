@@ -8,21 +8,21 @@ import (
 	"github.com/lmuench/godo/models"
 )
 
-// GetAll returns all todos
-func (api TodoAPI) GetAll(ctx echo.Context) error {
-	todos := api.repo.GetAll()
+// GetAllTodos returns all todos
+func (api TodoAPI) GetAllTodos(ctx echo.Context) error {
+	todos := api.repo.GetAllTodos()
 	return ctx.JSON(http.StatusOK, todos)
 }
 
-// TodoAPI - Todo Controller
+// TodoAPI controller
 type TodoAPI struct {
 	repo *models.TodoRepo
 }
 
-// Register routes
+// RegisterTodo registers todo routes
 func RegisterTodo(echo *echo.Echo, db *gorm.DB) {
 	repo := models.TodoRepo{DB: db}
 	api := TodoAPI{&repo}
 
-	echo.GET("/todos", api.GetAll)
+	echo.GET("/todos", api.GetAllTodos)
 }
