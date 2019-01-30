@@ -12,8 +12,11 @@ import (
 // GetAllTodos returns all todos
 func (api TodoAPI) GetAllTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	todos := api.repo.GetAllTodos()
+	respondWithJSON(w, todos)
+}
 
-	js, err := json.Marshal(todos)
+func respondWithJSON(w http.ResponseWriter, v interface{}) {
+	js, err := json.Marshal(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
