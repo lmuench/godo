@@ -1,28 +1,36 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
+	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/models"
 )
 
 // GetAllTodos returns all todos
-func (api TodoAPI) GetAllTodos(ctx echo.Context) error {
+func (api TodoAPI) GetAllTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	todos := api.repo.GetAllTodos()
-	return ctx.JSON(http.StatusOK, todos)
+
+	js, err := json.Marshal(todos)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
 }
 
 // TodoAPI controller
 type TodoAPI struct {
-	repo *models.TodoRepo
+	repo models.TodoRepo
 }
 
-// RegisterTodo registers todo routes
-func RegisterTodo(echo *echo.Echo, db *gorm.DB) {
+// NewTodoAPI constructor
+func NewTodoAPI(db *gorm.DB) TodoAPI {
 	repo := models.TodoRepo{DB: db}
-	api := TodoAPI{&repo}
-
-	echo.GET("/todos", api.GetAllTodos)
+	api := TodoAPI{repo}
+	return api
 }
