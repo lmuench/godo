@@ -11,11 +11,18 @@ type Todo struct {
 	Completed bool   `json:"completed"`
 }
 
-// GetAllTodos returns all todos
-func (repo TodoRepo) GetAllTodos() []Todo {
+// GetTodos returns all todos
+func (repo TodoRepo) GetTodos() []Todo {
 	var todos []Todo
 	repo.DB.Find(&todos)
 	return todos
+}
+
+// GetTodo returns todo with ID id
+func (repo TodoRepo) GetTodo(id int) Todo {
+	var todo Todo
+	repo.DB.First(&todo, id)
+	return todo
 }
 
 // TodoRepo repository

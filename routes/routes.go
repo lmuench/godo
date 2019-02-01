@@ -9,5 +9,6 @@ import (
 // InitRoutes registers routes
 func InitRoutes(router *httprouter.Router, db *gorm.DB) {
 	todoAPI := api.NewTodoAPI(db)
-	router.GET("/todos", todoAPI.GetAllTodos)
+	router.GET("/todos", todoAPI.GetTodos)
+	router.GET("/todos/:id", todoAPI.GetTodo)
 }
