@@ -1,4 +1,4 @@
-package config
+package routes
 
 import (
 	"github.com/jinzhu/gorm"
