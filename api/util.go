@@ -17,7 +17,6 @@ func RespondWithJSON(w http.ResponseWriter, v interface{}) {
 func Handle400(w http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
 	}
 }
 
@@ -25,6 +24,5 @@ func Handle400(w http.ResponseWriter, err error) {
 func Handle500(w http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 }
