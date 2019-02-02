@@ -1,19 +1,30 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 )
 
 // User model
 type User struct {
 	gorm.Model
-	Username string `json:"username" gorm:"AUTO_INCREMENT"`
+	Username string `json:"username" gorm:"primary_key"`
 	Password string `json:"password"`
 }
 
 // CreateUser creates new user record
 func (repo UserRepo) CreateUser(user User) error {
 	return repo.DB.Create(&user).Error
+}
+
+// GetUser returns user with provided username
+func (repo UserRepo) GetUser(username string) (User, error) {
+	var user User
+	if repo.DB.Where("username = ?", username).First(&user).RecordNotFound() {
+		return user, errors.New("User not found")
+	}
+	return user, nil
 }
 
 // UsernameTaken returns true if the provided username is already taken

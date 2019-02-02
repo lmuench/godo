@@ -10,12 +10,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// SignUp ...
+// SignUp creates a new user from the "username" and "password" params
 func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	_user := models.User{}
+	var _user models.User
 	err := json.NewDecoder(r.Body).Decode(&_user)
 	if err != nil {
 		http.Error(w, "400 Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	if len(_user.Password) < 8 {
+		http.Error(w, "Password must be at least 8 characters", http.StatusBadRequest)
 		return
 	}
 
@@ -34,7 +39,8 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		Username: _user.Username,
 		Password: string(hashedPassword),
 	}
-	if err := api.repo.CreateUser(user); err != nil {
+	err = api.repo.CreateUser(user)
+	if err != nil {
 		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -43,7 +49,26 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 
 // SignIn ...
 func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	var _user models.User
+	err := json.NewDecoder(r.Body).Decode(&_user)
+	if err != nil {
+		http.Error(w, "400 Bad Request", http.StatusBadRequest)
+		return
+	}
 
+	user, err := api.repo.GetUser(_user.Username)
+	if err != nil {
+		http.Error(w, "Username doesn't exist", http.StatusBadRequest)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(_user.Password))
+	if err != nil {
+		http.Error(w, "Incorrect password", http.StatusBadRequest)
+		return
+	}
+
+	//TODO
 }
 
 // UserAPI controller
