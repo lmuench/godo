@@ -14,7 +14,7 @@ import (
 func main() {
 	n := negroni.Classic()
 	router := httprouter.New()
-	db := orm.InitPG()
+	db := orm.InitDevPG()
 	defer db.Close()
 
 	routes.InitRoutes(router, db)
