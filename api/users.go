@@ -19,34 +19,9 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		return
 	}
 
-	if len(_user.Username) < 3 {
-		http.Error(w, "Username must be at least 3 characters long", http.StatusBadRequest)
-		return
-	}
-
-	if len(_user.Password) < 8 {
-		http.Error(w, "Password must be at least 8 characters long", http.StatusBadRequest)
-		return
-	}
-
-	if api.repo.UsernameTaken(_user.Username) {
-		http.Error(w, "Username already taken", http.StatusBadRequest)
-		return
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(_user.Password), 8)
+	err = api.repo.SignUp(_user)
 	if err != nil {
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	user := models.User{
-		Username: _user.Username,
-		Password: string(hashedPassword),
-	}
-	err = api.repo.CreateUser(user)
-	if err != nil {
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
