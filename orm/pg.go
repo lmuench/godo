@@ -29,8 +29,8 @@ func InitDevPG() *gorm.DB {
 	return db
 }
 
-// InitTestPG automigrates models and returns DB connection pointer
-func InitTestPG() *gorm.DB {
+// InitEmptyTestPG drops tables, automigrates models and returns DB connection pointer
+func InitEmptyTestPG() *gorm.DB {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
 		os.Getenv("GODO_TEST_DB_HOST"),
@@ -44,7 +44,7 @@ func InitTestPG() *gorm.DB {
 		panic("failed to connect to database")
 	}
 
-	db.DropTable(
+	db.DropTableIfExists(
 		&models.Todo{},
 		&models.User{},
 	)

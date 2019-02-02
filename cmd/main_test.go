@@ -22,7 +22,7 @@ var db *gorm.DB
 func TestMain(m *testing.M) {
 	n = negroni.Classic()
 	router := httprouter.New()
-	db = orm.InitTestPG()
+	db = orm.InitEmptyTestPG()
 	defer db.Close()
 
 	routes.InitRoutes(router, db)
