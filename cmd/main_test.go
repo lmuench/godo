@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/lmuench/godo/cache"
 	"github.com/lmuench/godo/middleware"
 	"github.com/lmuench/godo/orm"
 	"github.com/lmuench/godo/routes"
@@ -24,8 +25,9 @@ func TestMain(m *testing.M) {
 	router := httprouter.New()
 	db = orm.InitEmptyTestPG()
 	defer db.Close()
+	cache := cache.GetRedisConn()
 
-	routes.InitRoutes(router, db)
+	routes.InitRoutes(router, db, cache)
 
 	n.UseFunc(middleware.ContentTypeJSON)
 	n.UseFunc(middleware.CORS)

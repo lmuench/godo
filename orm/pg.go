@@ -48,8 +48,9 @@ func InitEmptyTestPG() *gorm.DB {
 		&models.Todo{},
 		&models.User{},
 	)
-
-	db.AutoMigrate(&models.Todo{})
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(
+		&models.Todo{},
+		&models.User{},
+	)
 	return db
 }

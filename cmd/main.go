@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/lmuench/godo/cache"
 	"github.com/lmuench/godo/middleware"
 	"github.com/lmuench/godo/orm"
 	"github.com/lmuench/godo/routes"
@@ -16,8 +17,9 @@ func main() {
 	router := httprouter.New()
 	db := orm.InitDevPG()
 	defer db.Close()
+	c := cache.GetRedisConn()
 
-	routes.InitRoutes(router, db)
+	routes.InitRoutes(router, db, c)
 
 	n.UseFunc(middleware.ContentTypeJSON)
 	n.UseFunc(middleware.CORS)

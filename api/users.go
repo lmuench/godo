@@ -3,10 +3,13 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/models"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -48,17 +51,29 @@ func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprou
 		return
 	}
 
-	//TODO
+	token := uuid.Must(uuid.NewV4()).String()
+	_, err = api.cache.Do("SETEX", token, "120", user.Username)
+	if err != nil {
+		http.Error(w, "Oops, something went wrong!", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   token,
+		Expires: time.Now().Add(120 * time.Second),
+	})
 }
 
 // UserAPI controller
 type UserAPI struct {
-	repo models.UserRepo
+	repo  models.UserRepo
+	cache redis.Conn
 }
 
 // NewUserAPI constructor
-func NewUserAPI(db *gorm.DB) UserAPI {
+func NewUserAPI(db *gorm.DB, cache redis.Conn) UserAPI {
 	repo := models.UserRepo{DB: db}
-	api := UserAPI{repo}
+	api := UserAPI{repo, cache}
 	return api
 }
