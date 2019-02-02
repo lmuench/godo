@@ -14,6 +14,7 @@ func InitPG() *gorm.DB {
 	if err != nil {
 		panic("failed to connect to database")
 	}
-	db.AutoMigrate(&models.Todo{}) // &-operator necessary?
+	db.AutoMigrate(&models.Todo{})
+	db.AutoMigrate(&models.User{})
 	return db
 }

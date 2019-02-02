@@ -18,7 +18,10 @@ func (api TodoAPI) GetTodos(w http.ResponseWriter, r *http.Request, _ httprouter
 // GetTodo returns all todos
 func (api TodoAPI) GetTodo(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	id, err := strconv.Atoi(params.ByName("id"))
-	Handle400(w, err)
+	if err != nil {
+		http.Error(w, "400 Bad Request", http.StatusBadRequest)
+		return
+	}
 	todos := api.repo.GetTodo(id)
 	RespondWithJSON(w, todos)
 }

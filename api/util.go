@@ -2,27 +2,23 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 )
 
 // RespondWithJSON parses v as JSON and responds with "OK" and v or "Bad Request"
 func RespondWithJSON(w http.ResponseWriter, v interface{}) {
 	js, err := json.Marshal(v)
-	Handle500(w, err)
+	if err != nil {
+		logWithTimestamp(err)
+		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(js)
 }
 
-// Handle400 responds with "Bad Request" status if err != nil
-func Handle400(w http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-}
-
-// Handle500 responds with "Internal Server Error" status if err != nil
-func Handle500(w http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+func logWithTimestamp(err error) {
+	log.Println(time.Now().Format(time.RFC850), err.Error())
 }

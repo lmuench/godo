@@ -18,7 +18,7 @@ func (repo TodoRepo) GetTodos() []Todo {
 	return todos
 }
 
-// GetTodo returns todo with ID id
+// GetTodo returns todo with provided ID
 func (repo TodoRepo) GetTodo(id int) Todo {
 	var todo Todo
 	repo.DB.First(&todo, id)
