@@ -19,8 +19,13 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		return
 	}
 
+	if len(_user.Username) < 3 {
+		http.Error(w, "Username must be at least 3 characters long", http.StatusBadRequest)
+		return
+	}
+
 	if len(_user.Password) < 8 {
-		http.Error(w, "Password must be at least 8 characters", http.StatusBadRequest)
+		http.Error(w, "Password must be at least 8 characters long", http.StatusBadRequest)
 		return
 	}
 
