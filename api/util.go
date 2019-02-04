@@ -8,9 +8,9 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// HandleUserVerification returns username of logged-in user
+// GetToken returns session token of current client
 // or replies with error status and returns error
-func HandleUserVerification(w http.ResponseWriter, r *http.Request, cache redis.Conn) (string, error) {
+func GetToken(w http.ResponseWriter, r *http.Request) (string, error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -21,7 +21,12 @@ func HandleUserVerification(w http.ResponseWriter, r *http.Request, cache redis.
 		return "", err
 	}
 	token := cookie.Value
+	return token, nil
+}
 
+// GetUsername returns username mapped to session token
+// or replies with error status and returns error
+func GetUsername(w http.ResponseWriter, cache redis.Conn, token string) (string, error) {
 	reply, err := cache.Do("GET", token)
 	if err != nil {
 		http.Error(w, "Oops, something went wrong!", http.StatusInternalServerError)

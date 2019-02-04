@@ -65,6 +65,37 @@ func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprou
 	})
 }
 
+// Refresh ...
+func (api UserAPI) Refresh(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	oldToken, err := GetToken(w, r)
+	if err != nil {
+		return
+	}
+	username, err := GetUsername(w, api.cache, oldToken)
+	if err != nil {
+		return
+	}
+
+	newToken := uuid.Must(uuid.NewV4()).String()
+	_, err = api.cache.Do("SETEX", newToken, "120", username)
+	if err != nil {
+		http.Error(w, "Oops, something went wrong!", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = api.cache.Do("DEL", oldToken)
+	if err != nil {
+		http.Error(w, "Oops, something went wrong!", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   newToken,
+		Expires: time.Now().Add(120 * time.Second),
+	})
+}
+
 // UserAPI controller
 type UserAPI struct {
 	repo  models.UserRepo

@@ -12,7 +12,7 @@ import (
 
 // GetTodos returns all todos
 func (api TodoAPI) GetTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if _, err := HandleUserVerification(w, r, api.cache); err != nil {
+	if _, err := GetToken(w, r); err != nil {
 		return
 	}
 	todos := api.repo.GetTodos()

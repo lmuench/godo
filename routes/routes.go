@@ -15,4 +15,5 @@ func InitRoutes(router *httprouter.Router, db *gorm.DB, cache redis.Conn) {
 	router.GET("/todos/:id", todoAPI.GetTodo)
 	router.POST("/sign-up", userAPI.SignUp)
 	router.POST("/sign-in", userAPI.SignIn)
+	router.POST("/refresh", userAPI.Refresh)
 }
