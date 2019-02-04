@@ -25,5 +25,6 @@ func main() {
 	n.UseFunc(middleware.CORS)
 	n.UseHandler(router)
 
-	log.Fatal(http.ListenAndServe(":1323", n))
+	log.Println("Server listening on port 5000")
+	log.Fatal(http.ListenAndServe(":5000", n))
 }

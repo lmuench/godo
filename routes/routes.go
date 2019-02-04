@@ -9,7 +9,7 @@ import (
 
 // InitRoutes registers routes
 func InitRoutes(router *httprouter.Router, db *gorm.DB, cache redis.Conn) {
-	todoAPI := api.NewTodoAPI(db)
+	todoAPI := api.NewTodoAPI(db, cache)
 	userAPI := api.NewUserAPI(db, cache)
 	router.GET("/todos", todoAPI.GetTodos)
 	router.GET("/todos/:id", todoAPI.GetTodo)
