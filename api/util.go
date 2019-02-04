@@ -48,6 +48,6 @@ func RespondWithJSON(w http.ResponseWriter, v interface{}) {
 		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 }

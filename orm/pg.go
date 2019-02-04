@@ -7,10 +7,11 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // For configuration
 	"github.com/lmuench/godo/models"
+	"github.com/qor/admin"
 )
 
 // InitDevPG automigrates models and returns DB connection pointer
-func InitDevPG() *gorm.DB {
+func InitDevPG() (*gorm.DB, *admin.Admin) {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
 		os.Getenv("GODO_DEV_DB_HOST"),
@@ -26,7 +27,12 @@ func InitDevPG() *gorm.DB {
 
 	db.AutoMigrate(&models.Todo{})
 	db.AutoMigrate(&models.User{})
-	return db
+
+	adm := admin.New(&admin.AdminConfig{DB: db})
+	adm.AddResource(&models.Todo{})
+	adm.AddResource(&models.User{})
+
+	return db, adm
 }
 
 // InitEmptyTestPG drops tables, automigrates models and returns DB connection pointer

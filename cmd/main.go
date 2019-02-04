@@ -15,15 +15,18 @@ import (
 func main() {
 	n := negroni.Classic()
 	router := httprouter.New()
-	db := orm.InitDevPG()
+	db, adm := orm.InitDevPG()
 	defer db.Close()
 	c := cache.GetRedisConn()
 
 	routes.InitRoutes(router, db, c)
 
-	n.UseFunc(middleware.ContentTypeJSON)
 	n.UseFunc(middleware.CORS)
-	n.UseHandler(router)
+
+	mux := http.NewServeMux()
+	mux.Handle("/", router)
+	adm.MountTo("/admin", mux)
+	n.UseHandler(mux)
 
 	log.Println("Server listening on port 5000")
 	log.Fatal(http.ListenAndServe(":5000", n))
