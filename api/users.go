@@ -59,9 +59,10 @@ func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprou
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   token,
-		Expires: time.Now().Add(120 * time.Second),
+		Name:     "session_token",
+		Value:    token,
+		Expires:  time.Now().Add(120 * time.Second),
+		HttpOnly: true,
 	})
 }
 
@@ -90,9 +91,10 @@ func (api UserAPI) Refresh(w http.ResponseWriter, r *http.Request, params httpro
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   newToken,
-		Expires: time.Now().Add(120 * time.Second),
+		Name:     "session_token",
+		Value:    newToken,
+		Expires:  time.Now().Add(120 * time.Second),
+		HttpOnly: true,
 	})
 }
 
