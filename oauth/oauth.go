@@ -3,7 +3,6 @@ package oauth
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,12 +13,6 @@ import (
 
 // Redirect handler function
 func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if len(os.Getenv("GODO_DEV_GITHUB_OAUTH_CLIENT_SECRET")) == 0 {
-		log.Println("Github OAuth client secret environment variable not set!")
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	err := r.ParseForm()
 	if err != nil {
 		respondWithLoginError(w)
@@ -33,7 +26,7 @@ func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 
 	reqURL := fmt.Sprintf(
 		"https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s",
-		"d16b40960181dea3d5e8",
+		os.Getenv("GODO_DEV_GITHUB_OAUTH_CLIENT_ID"),
 		os.Getenv("GODO_DEV_GITHUB_OAUTH_CLIENT_SECRET"),
 		code,
 	)
