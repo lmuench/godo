@@ -29,7 +29,6 @@ func TestMain(m *testing.M) {
 
 	routes.InitRoutes(router, db, cache)
 
-	n.UseFunc(middleware.ContentTypeJSON)
 	n.UseFunc(middleware.CORS)
 	n.UseHandler(router)
 
