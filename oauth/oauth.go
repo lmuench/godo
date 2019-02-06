@@ -3,6 +3,7 @@ package oauth
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -15,12 +16,12 @@ import (
 func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err := r.ParseForm()
 	if err != nil {
-		respondWithLoginError(w)
+		respondWithLoginError(w, err)
 		return
 	}
 	code := r.FormValue("code")
 	if len(code) == 0 {
-		respondWithLoginError(w)
+		respondWithLoginError(w, err)
 		return
 	}
 
@@ -32,7 +33,7 @@ func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	)
 	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
-		respondWithLoginError(w)
+		respondWithLoginError(w, err)
 		return
 	}
 	req.Header.Set("accept", "application/json")
@@ -40,7 +41,7 @@ func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		respondWithLoginError(w)
+		respondWithLoginError(w, err)
 		return
 	}
 	defer res.Body.Close()
@@ -48,23 +49,25 @@ func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	var token AccessToken
 	err = json.NewDecoder(res.Body).Decode(&token)
 	if err != nil {
-		respondWithLoginError(w)
+		respondWithLoginError(w, err)
 		return
 	}
 
-	// api.cache.Do("SET", token.Value, "1")
-	api.cacheTokenAndUsername(w, token)
+	err = api.cacheTokenAndGitHubID(token)
+	if err != nil {
+		respondWithLoginError(w, err)
+		return
+	}
 
 	w.Header().Set("Location", "/welcome.html?access_token="+token.Value)
 	w.WriteHeader(http.StatusFound)
 }
 
-func (api API) cacheTokenAndUsername(w http.ResponseWriter, token AccessToken) {
+func (api API) cacheTokenAndGitHubID(token AccessToken) error {
 	url := "https://api.github.com/user"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		respondWithLoginError(w)
-		return
+		return err
 	}
 	req.Header.Set("accept", "application/json; charset=utf-8")
 	req.Header.Set("Authorization", "token "+token.Value)
@@ -72,19 +75,18 @@ func (api API) cacheTokenAndUsername(w http.ResponseWriter, token AccessToken) {
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		respondWithLoginError(w)
-		return
+		return err
 	}
 	defer res.Body.Close()
 
-	var username Username
-	err = json.NewDecoder(res.Body).Decode(&username)
+	var id GitHubID
+	err = json.NewDecoder(res.Body).Decode(&id)
 	if err != nil {
-		respondWithLoginError(w)
-		return
+		return err
 	}
 
-	api.cache.Do("SET", token.Value, username.Value)
+	api.cache.Do("SET", token.Value, id.Value)
+	return nil
 }
 
 // AccessToken contains OAuth access token
@@ -92,12 +94,13 @@ type AccessToken struct {
 	Value string `json:"access_token"`
 }
 
-// Username contains GitHub (login) username
-type Username struct {
-	Value string `json:"login"`
+// GitHubID contains GitHub ID
+type GitHubID struct {
+	Value int `json:"id"`
 }
 
-func respondWithLoginError(w http.ResponseWriter) {
+func respondWithLoginError(w http.ResponseWriter, err error) {
+	log.Println(err)
 	http.Error(
 		w,
 		"Oops, something went wrong. Please try logging in again",
