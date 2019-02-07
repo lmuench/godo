@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -110,12 +109,11 @@ func respondWithLoginError(w http.ResponseWriter, err error) {
 
 // API receiver
 type API struct {
-	db    *gorm.DB
 	cache redis.Conn
 }
 
 // NewAPI constructor
-func NewAPI(db *gorm.DB, cache redis.Conn) API {
-	o := API{db, cache}
+func NewAPI(cache redis.Conn) API {
+	o := API{cache}
 	return o
 }

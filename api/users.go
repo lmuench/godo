@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/models"
 	uuid "github.com/satori/go.uuid"
@@ -105,8 +104,7 @@ type UserAPI struct {
 }
 
 // NewUserAPI constructor
-func NewUserAPI(db *gorm.DB, cache redis.Conn) UserAPI {
-	repo := models.UserRepo{DB: db}
+func NewUserAPI(repo models.UserRepo, cache redis.Conn) UserAPI {
 	api := UserAPI{repo, cache}
 	return api
 }

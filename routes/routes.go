@@ -2,17 +2,19 @@ package routes
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/api"
 	"github.com/lmuench/godo/oauth"
 )
 
 // InitRoutes registers routes
-func InitRoutes(router *httprouter.Router, db *gorm.DB, cache redis.Conn) {
-	todoAPI := api.NewTodoAPI(db, cache)
-	userAPI := api.NewUserAPI(db, cache)
-	oauthAPI := oauth.NewAPI(db, cache)
+func InitRoutes(
+	router *httprouter.Router,
+	cache redis.Conn,
+	todoAPI api.TodoAPI,
+	userAPI api.UserAPI,
+	oauthAPI oauth.API,
+) {
 	router.GET("/todos", todoAPI.GetTodos)
 	router.GET("/todos/:id", todoAPI.GetTodo)
 	router.POST("/sign-up", userAPI.SignUp)

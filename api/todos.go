@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/models"
 )
@@ -37,8 +36,7 @@ type TodoAPI struct {
 }
 
 // NewTodoAPI constructor
-func NewTodoAPI(db *gorm.DB, cache redis.Conn) TodoAPI {
-	repo := models.TodoRepo{DB: db}
+func NewTodoAPI(repo models.TodoRepo, cache redis.Conn) TodoAPI {
 	api := TodoAPI{repo, cache}
 	return api
 }
