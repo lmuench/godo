@@ -1,9 +1,6 @@
 package cache
 
-import (
-	"github.com/gomodule/redigo/redis"
-	_ "github.com/jinzhu/gorm/dialects/postgres" // For configuration
-)
+import "github.com/gomodule/redigo/redis"
 
 // GetRedisConn returns Redis connection
 func GetRedisConn() redis.Conn {
