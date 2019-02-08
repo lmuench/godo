@@ -1,8 +1,8 @@
-package models
+package types
 
 import "github.com/jinzhu/gorm"
 
-// Todo model
+// Todo type
 type Todo struct {
 	gorm.Model
 	Title     string `json:"title"`

@@ -4,17 +4,17 @@ import (
 	"errors"
 
 	"github.com/jinzhu/gorm"
-	"github.com/lmuench/godo/internal/pkg/services/models"
+	"github.com/lmuench/godo/internal/pkg/services/types"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // createUser creates new user record
-func (s Users) createUser(user models.User) error {
+func (s Users) createUser(user types.User) error {
 	return s.DB.Create(&user).Error
 }
 
 // SignUp validates username and password lengths, hashes password and calls CreateUser
-func (s Users) SignUp(_user models.User) error {
+func (s Users) SignUp(_user types.User) error {
 	if len(_user.Username) < 3 {
 		return errors.New("Username must be at least 3 characters long")
 	}
@@ -32,7 +32,7 @@ func (s Users) SignUp(_user models.User) error {
 		return errors.New("Please choose a different password")
 	}
 
-	user := models.User{
+	user := types.User{
 		Username: _user.Username,
 		Password: string(hashedPassword),
 	}
@@ -44,8 +44,8 @@ func (s Users) SignUp(_user models.User) error {
 }
 
 // GetUser returns user with provided username
-func (s Users) GetUser(username string) (models.User, error) {
-	var user models.User
+func (s Users) GetUser(username string) (types.User, error) {
+	var user types.User
 	if s.DB.Where("username = ?", username).First(&user).RecordNotFound() {
 		return user, errors.New("User not found")
 	}
@@ -54,7 +54,7 @@ func (s Users) GetUser(username string) (models.User, error) {
 
 // UsernameTaken returns true if the provided username is already taken
 func (s Users) UsernameTaken(username string) bool {
-	return !s.DB.Where("username = ?", username).First(&models.User{}).RecordNotFound()
+	return !s.DB.Where("username = ?", username).First(&types.User{}).RecordNotFound()
 }
 
 // Users ...

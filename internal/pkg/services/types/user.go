@@ -1,8 +1,8 @@
-package models
+package types
 
 import "github.com/jinzhu/gorm"
 
-// User model
+// User type
 type User struct {
 	gorm.Model
 	Username string `json:"username" gorm:"not null; unique"`

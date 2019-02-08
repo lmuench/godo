@@ -6,11 +6,11 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // For configuration
-	"github.com/lmuench/godo/internal/pkg/services/models"
+	"github.com/lmuench/godo/internal/pkg/services/types"
 	"github.com/qor/admin"
 )
 
-// InitPostgresDev automigrates models and returns DB connection pointer
+// InitPostgresDev automigrates gorm models and returns DB connection pointer
 func InitPostgresDev() (*gorm.DB, *admin.Admin) {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
@@ -25,17 +25,17 @@ func InitPostgresDev() (*gorm.DB, *admin.Admin) {
 		panic("failed to connect to database")
 	}
 
-	db.AutoMigrate(&models.Todo{})
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&types.Todo{})
+	db.AutoMigrate(&types.User{})
 
 	adm := admin.New(&admin.AdminConfig{DB: db})
-	adm.AddResource(&models.Todo{})
-	adm.AddResource(&models.User{})
+	adm.AddResource(&types.Todo{})
+	adm.AddResource(&types.User{})
 
 	return db, adm
 }
 
-// InitPostgresTest drops tables, automigrates models and returns DB connection pointer
+// InitPostgresTest drops tables, automigrates gorm models and returns DB connection pointer
 func InitPostgresTest() *gorm.DB {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
@@ -51,12 +51,12 @@ func InitPostgresTest() *gorm.DB {
 	}
 
 	db.DropTableIfExists(
-		&models.Todo{},
-		&models.User{},
+		&types.Todo{},
+		&types.User{},
 	)
 	db.AutoMigrate(
-		&models.Todo{},
-		&models.User{},
+		&types.Todo{},
+		&types.User{},
 	)
 	return db
 }

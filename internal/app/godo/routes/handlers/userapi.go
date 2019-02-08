@@ -8,14 +8,14 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lmuench/godo/internal/pkg/services"
-	"github.com/lmuench/godo/internal/pkg/services/models"
+	"github.com/lmuench/godo/internal/pkg/services/types"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // SignUp creates a new user from the "username" and "password" params
 func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var _user models.User
+	var _user types.User
 	err := json.NewDecoder(r.Body).Decode(&_user)
 	if err != nil {
 		http.Error(w, "400 Bad Request", http.StatusBadRequest)
@@ -32,7 +32,7 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 
 // SignIn ...
 func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	var _user models.User
+	var _user types.User
 	err := json.NewDecoder(r.Body).Decode(&_user)
 	if err != nil {
 		http.Error(w, "400 Bad Request", http.StatusBadRequest)
