@@ -13,9 +13,9 @@ import (
 	"github.com/lmuench/godo/internal/app/godo/middleware"
 	"github.com/lmuench/godo/internal/app/godo/routes"
 	"github.com/lmuench/godo/internal/app/godo/routes/handlers"
-	"github.com/lmuench/godo/internal/app/godo/routes/handlers/cache"
 	"github.com/lmuench/godo/internal/pkg/services"
-	"github.com/lmuench/godo/internal/pkg/services/orm"
+	"github.com/lmuench/godo/internal/platform/cache"
+	"github.com/lmuench/godo/internal/platform/orm"
 	"github.com/urfave/negroni"
 )
 
@@ -25,7 +25,7 @@ var db *gorm.DB
 func TestMain(m *testing.M) {
 	n = negroni.Classic()
 	router := httprouter.New()
-	db = orm.InitEmptyTestPG()
+	db = orm.InitPostgresTest()
 	defer db.Close()
 	c := cache.GetRedisConn()
 

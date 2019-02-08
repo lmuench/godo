@@ -10,8 +10,8 @@ import (
 	"github.com/qor/admin"
 )
 
-// InitDevPG automigrates models and returns DB connection pointer
-func InitDevPG() (*gorm.DB, *admin.Admin) {
+// InitPostgresDev automigrates models and returns DB connection pointer
+func InitPostgresDev() (*gorm.DB, *admin.Admin) {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
 		os.Getenv("GODO_DEV_DB_HOST"),
@@ -35,8 +35,8 @@ func InitDevPG() (*gorm.DB, *admin.Admin) {
 	return db, adm
 }
 
-// InitEmptyTestPG drops tables, automigrates models and returns DB connection pointer
-func InitEmptyTestPG() *gorm.DB {
+// InitPostgresTest drops tables, automigrates models and returns DB connection pointer
+func InitPostgresTest() *gorm.DB {
 	conf := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s",
 		os.Getenv("GODO_TEST_DB_HOST"),

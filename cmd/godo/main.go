@@ -8,16 +8,16 @@ import (
 	"github.com/lmuench/godo/internal/app/godo/middleware"
 	"github.com/lmuench/godo/internal/app/godo/routes"
 	"github.com/lmuench/godo/internal/app/godo/routes/handlers"
-	"github.com/lmuench/godo/internal/app/godo/routes/handlers/cache"
 	"github.com/lmuench/godo/internal/pkg/services"
-	"github.com/lmuench/godo/internal/pkg/services/orm"
+	"github.com/lmuench/godo/internal/platform/cache"
+	"github.com/lmuench/godo/internal/platform/orm"
 	"github.com/urfave/negroni"
 )
 
 func main() {
 	n := negroni.Classic()
 	router := httprouter.New()
-	db, adm := orm.InitDevPG()
+	db, adm := orm.InitPostgresDev()
 	defer db.Close()
 	c := cache.GetRedisConn()
 
