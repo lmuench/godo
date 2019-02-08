@@ -8,16 +8,17 @@ import (
 
 // InitRoutes registers routes
 func InitRoutes(
-	router *httprouter.Router,
 	cache redis.Conn,
 	todoAPI handlers.TodoAPI,
 	userAPI handlers.UserAPI,
 	oauth2API handlers.OAuth2API,
-) {
+) *httprouter.Router {
+	router := httprouter.New()
 	router.GET("/todos", todoAPI.GetTodos)
 	router.GET("/todos/:id", todoAPI.GetTodo)
 	router.POST("/sign-up", userAPI.SignUp)
 	router.POST("/sign-in", userAPI.SignIn)
 	router.POST("/refresh", userAPI.Refresh)
 	router.GET("/oauth/redirect", oauth2API.Redirect)
+	return router
 }
