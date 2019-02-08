@@ -1,4 +1,4 @@
-package oauth
+package handlers
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 )
 
 // Redirect handler function
-func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (api OAuth2API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err := r.ParseForm()
 	if err != nil {
 		respondWithLoginError(w, err)
@@ -62,7 +62,7 @@ func (api API) Redirect(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	w.WriteHeader(http.StatusFound)
 }
 
-func (api API) cacheTokenAndGitHubID(token AccessToken) error {
+func (api OAuth2API) cacheTokenAndGitHubID(token AccessToken) error {
 	url := "https://api.github.com/user"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -107,13 +107,13 @@ func respondWithLoginError(w http.ResponseWriter, err error) {
 	)
 }
 
-// API receiver
-type API struct {
+// OAuth2API receiver
+type OAuth2API struct {
 	cache redis.Conn
 }
 
-// NewAPI constructor
-func NewAPI(cache redis.Conn) API {
-	o := API{cache}
+// NewOAuth2API constructor
+func NewOAuth2API(cache redis.Conn) OAuth2API {
+	o := OAuth2API{cache}
 	return o
 }

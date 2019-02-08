@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"encoding/json"
@@ -7,7 +7,8 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/julienschmidt/httprouter"
-	"github.com/lmuench/godo/models"
+	"github.com/lmuench/godo/internal/pkg/services"
+	"github.com/lmuench/godo/internal/pkg/services/models"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,7 +22,7 @@ func (api UserAPI) SignUp(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		return
 	}
 
-	err = api.repo.SignUp(_user)
+	err = api.service.SignUp(_user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -38,7 +39,7 @@ func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprou
 		return
 	}
 
-	user, err := api.repo.GetUser(_user.Username)
+	user, err := api.service.GetUser(_user.Username)
 	if err != nil {
 		http.Error(w, "Username doesn't exist", http.StatusBadRequest)
 		return
@@ -67,11 +68,11 @@ func (api UserAPI) SignIn(w http.ResponseWriter, r *http.Request, params httprou
 
 // Refresh ...
 func (api UserAPI) Refresh(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	oldToken, err := GetToken(w, r)
+	oldToken, err := getToken(w, r)
 	if err != nil {
 		return
 	}
-	username, err := GetUsername(w, api.cache, oldToken)
+	username, err := getUsername(w, api.cache, oldToken)
 	if err != nil {
 		return
 	}
@@ -97,14 +98,46 @@ func (api UserAPI) Refresh(w http.ResponseWriter, r *http.Request, params httpro
 	})
 }
 
+// getToken returns session token of current client
+// or replies with error status and returns error
+func getToken(w http.ResponseWriter, r *http.Request) (string, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Error(w, "You need to login first", http.StatusUnauthorized)
+			return "", err
+		}
+		http.Error(w, "Oops, something went wrong!", http.StatusBadRequest)
+		return "", err
+	}
+	token := cookie.Value
+	return token, nil
+}
+
+// getUsername returns username mapped to session token
+// or replies with error status and returns error
+func getUsername(w http.ResponseWriter, cache redis.Conn, token string) (string, error) {
+	reply, err := cache.Do("GET", token)
+	if err != nil {
+		http.Error(w, "Oops, something went wrong!", http.StatusInternalServerError)
+		return "", err
+	}
+	username, err := redis.String(reply, err)
+	if err != nil {
+		http.Error(w, "You need to login again!", http.StatusUnauthorized)
+		return "", err
+	}
+	return username, nil
+}
+
 // UserAPI controller
 type UserAPI struct {
-	repo  models.UserRepo
-	cache redis.Conn
+	service services.Users
+	cache   redis.Conn
 }
 
 // NewUserAPI constructor
-func NewUserAPI(repo models.UserRepo, cache redis.Conn) UserAPI {
-	api := UserAPI{repo, cache}
+func NewUserAPI(service services.Users, cache redis.Conn) UserAPI {
+	api := UserAPI{service, cache}
 	return api
 }

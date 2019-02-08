@@ -6,7 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // For configuration
-	"github.com/lmuench/godo/models"
+	"github.com/lmuench/godo/internal/pkg/services/models"
 	"github.com/qor/admin"
 )
 

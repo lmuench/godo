@@ -1,26 +1,20 @@
-package models
+package services
 
 import (
 	"errors"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lmuench/godo/internal/pkg/services/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User model
-type User struct {
-	gorm.Model
-	Username string `json:"username" gorm:"not null; unique"`
-	Password string `json:"password" gorm:"not null"`
-}
-
 // createUser creates new user record
-func (repo UserRepo) createUser(user User) error {
-	return repo.DB.Create(&user).Error
+func (s Users) createUser(user models.User) error {
+	return s.DB.Create(&user).Error
 }
 
 // SignUp validates username and password lengths, hashes password and calls CreateUser
-func (repo UserRepo) SignUp(_user User) error {
+func (s Users) SignUp(_user models.User) error {
 	if len(_user.Username) < 3 {
 		return errors.New("Username must be at least 3 characters long")
 	}
@@ -29,7 +23,7 @@ func (repo UserRepo) SignUp(_user User) error {
 		return errors.New("Password must be at least 8 characters long")
 	}
 
-	if repo.UsernameTaken(_user.Username) {
+	if s.UsernameTaken(_user.Username) {
 		return errors.New("Username already taken")
 	}
 
@@ -38,11 +32,11 @@ func (repo UserRepo) SignUp(_user User) error {
 		return errors.New("Please choose a different password")
 	}
 
-	user := User{
+	user := models.User{
 		Username: _user.Username,
 		Password: string(hashedPassword),
 	}
-	err = repo.createUser(user)
+	err = s.createUser(user)
 	if err != nil {
 		return errors.New("Please choose a different username")
 	}
@@ -50,20 +44,20 @@ func (repo UserRepo) SignUp(_user User) error {
 }
 
 // GetUser returns user with provided username
-func (repo UserRepo) GetUser(username string) (User, error) {
-	var user User
-	if repo.DB.Where("username = ?", username).First(&user).RecordNotFound() {
+func (s Users) GetUser(username string) (models.User, error) {
+	var user models.User
+	if s.DB.Where("username = ?", username).First(&user).RecordNotFound() {
 		return user, errors.New("User not found")
 	}
 	return user, nil
 }
 
 // UsernameTaken returns true if the provided username is already taken
-func (repo UserRepo) UsernameTaken(username string) bool {
-	return !repo.DB.Where("username = ?", username).First(&User{}).RecordNotFound()
+func (s Users) UsernameTaken(username string) bool {
+	return !s.DB.Where("username = ?", username).First(&models.User{}).RecordNotFound()
 }
 
-// UserRepo repository
-type UserRepo struct {
+// Users ...
+type Users struct {
 	DB *gorm.DB
 }

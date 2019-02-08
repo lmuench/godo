@@ -10,13 +10,12 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/lmuench/godo/api"
-	"github.com/lmuench/godo/cache"
-	"github.com/lmuench/godo/middleware"
-	"github.com/lmuench/godo/models"
-	"github.com/lmuench/godo/oauth"
-	"github.com/lmuench/godo/orm"
-	"github.com/lmuench/godo/routes"
+	"github.com/lmuench/godo/internal/app/godo/middleware"
+	"github.com/lmuench/godo/internal/app/godo/routes"
+	"github.com/lmuench/godo/internal/app/godo/routes/handlers"
+	"github.com/lmuench/godo/internal/app/godo/routes/handlers/cache"
+	"github.com/lmuench/godo/internal/pkg/services"
+	"github.com/lmuench/godo/internal/pkg/services/orm"
 	"github.com/urfave/negroni"
 )
 
@@ -30,10 +29,10 @@ func TestMain(m *testing.M) {
 	defer db.Close()
 	c := cache.GetRedisConn()
 
-	todoAPI := api.NewTodoAPI(models.TodoRepo{DB: db}, c)
-	userAPI := api.NewUserAPI(models.UserRepo{DB: db}, c)
-	oauthAPI := oauth.NewAPI(c)
-	routes.InitRoutes(router, c, todoAPI, userAPI, oauthAPI)
+	todoAPI := handlers.NewTodoAPI(services.Todos{DB: db}, c)
+	userAPI := handlers.NewUserAPI(services.Users{DB: db}, c)
+	oauth2API := handlers.NewOAuth2API(c)
+	routes.InitRoutes(router, c, todoAPI, userAPI, oauth2API)
 
 	n.UseFunc(middleware.CORS)
 	n.UseHandler(router)
